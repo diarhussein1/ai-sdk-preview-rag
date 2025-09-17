@@ -1,6 +1,6 @@
 Pdf dependency toegevoegd voor ingest deel: 
 npm i pdf-parse
-npm i pdf-parse pdfjs-dist
+npm i pdfjs-dist@3
 
 
 docker run --name rag-pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
@@ -13,7 +13,7 @@ docker run --name rag-pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres
    DATABASE_URL=your_postgres_connection_string_here
    ```
 
-
+rm -rf .next
 npm install
 npm run db:migrate
 npm run dev

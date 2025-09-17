@@ -33,7 +33,7 @@
     "nanoid": "^5.0.9",
     "next": "15.1.0",
     "pdf-parse": "^1.1.1",
-    "pdfjs-dist": "^5.4.149",
+    "pdfjs-dist": "^3.11.174",
     "postgres": "^3.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { resources } from "@/lib/db/schema/resources";
-import { embeddings } from "@/lib/db/schema/embeddings"; // <-- ensure this matches your file
+import { embeddings } from "@/lib/db/schema/embeddings";
 import { embedMany } from "ai";
 import { openai } from "@ai-sdk/openai";
 
@@ -10,7 +10,17 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-// simple chunker with overlap
+// --------- helpers ----------
+async function fileToBuffer(file: any): Promise<Buffer> {
+  if (file && typeof file.arrayBuffer === "function") {
+    return Buffer.from(await file.arrayBuffer());
+  }
+  if (file && typeof file.stream === "function") {
+    return Buffer.from(await new Response(file.stream()).arrayBuffer());
+  }
+  throw new Error("Unsupported file type (no arrayBuffer/stream)");
+}
+
 function chunk(t: string, size = 800, overlap = 100) {
   const out: string[] = [];
   for (let i = 0; i < t.length; i += Math.max(1, size - overlap)) {
@@ -19,31 +29,36 @@ function chunk(t: string, size = 800, overlap = 100) {
   return out;
 }
 
-// robust: support both .arrayBuffer() and .stream()
-async function fileToBuffer(file: any): Promise<Buffer> {
-  if (file && typeof file.arrayBuffer === "function") {
-    const ab = await file.arrayBuffer();
-    return Buffer.from(ab);
+// Laad pdfjs uit verschillende paden (versie-afhankelijk)
+
+async function extractPdfText(buf: Buffer) {
+  const pdfjs: any = await import("pdfjs-dist/legacy/build/pdf.js"); // v3
+  if (pdfjs.GlobalWorkerOptions) {
+    pdfjs.GlobalWorkerOptions.workerSrc = "pdfjs-dist/legacy/build/pdf.worker.js";
   }
-  if (file && typeof file.stream === "function") {
-    const ab = await new Response(file.stream()).arrayBuffer();
-    return Buffer.from(ab);
+
+  // 👇 belangrijk: Uint8Array i.p.v. Buffer
+  const loadingTask = pdfjs.getDocument({ data: new Uint8Array(buf) });
+  const doc = await loadingTask.promise;
+
+  let out = "";
+  for (let p = 1; p <= doc.numPages; p++) {
+    const page = await doc.getPage(p);
+    const content = await page.getTextContent();
+    out += content.items.map((it: any) => it.str ?? "").join(" ");
+    if (p < doc.numPages) out += "\n\n";
   }
-  throw new Error("Unsupported file type (no arrayBuffer/stream)");
+  return out.trim();
 }
 
 async function textFromFile(file: any) {
   const buf = await fileToBuffer(file);
   const name = (file?.name || "").toLowerCase();
-
-  if (name.endsWith(".pdf")) {
-    const pdfParse = (await import("pdf-parse")).default;
-    const parsed = await pdfParse(buf);
-    return (parsed.text || "").trim();
-  }
-  // default: treat as text (txt/md/csv/etc.)
+  if (name.endsWith(".pdf")) return await extractPdfText(buf);
   return buf.toString("utf-8").trim();
 }
+
+// --------- /helpers ----------
 
 export async function POST(req: Request) {
   try {
@@ -68,7 +83,6 @@ export async function POST(req: Request) {
       const chunks = chunk(raw);
       if (chunks.length === 0) continue;
 
-      // 1) generate embeddings for all chunks
       const { embeddings: vecs } = await embedMany({
         model: openai.embedding("text-embedding-3-small"), // 1536 dims
         values: chunks,
@@ -78,9 +92,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Embedding count mismatch" }, { status: 500 });
       }
 
-      // 2) store each chunk:
-      //    - insert into resources (content)
-      //    - insert into embeddings with FK + vector + content (your schema requires content NOT NULL)
       for (let i = 0; i < chunks.length; i++) {
         const content = chunks[i];
         const vector = vecs[i];
@@ -91,10 +102,9 @@ export async function POST(req: Request) {
           .returning({ id: resources.id });
 
         await db.insert(embeddings).values({
-          // ---- adjust these three keys if your columns differ ----
-          resourceId: row.id,  // FK to resources
-          content,             // your `embeddings` table requires NOT NULL content
-          embedding: vector,   // pgvector column (1536)
+          resourceId: row.id,
+          content,          // jouw embeddings-schema vereist content NOT NULL
+          embedding: vector // pgvector kolom (1536)
         });
 
         inserted++;
