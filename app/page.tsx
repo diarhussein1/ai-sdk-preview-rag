@@ -125,6 +125,8 @@ export default function Home() {
   // --- Recent sources
   const [recent, setRecent] = useState<RecentItem[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+  const [clearing, setClearing] = useState(false);
 
   async function loadRecent() {
     try {
@@ -136,6 +138,57 @@ export default function Home() {
       console.warn("Failed to load recent:", e);
     } finally {
       setRecentLoading(false);
+    }
+  }
+
+  // --- Deletion helpers
+  async function deleteResource(id: string) {
+    // optimistic remove
+    const prev = recent;
+    const next = prev.filter((r) => r.resourceId !== id);
+    setRecent(next);
+    setDeletingIds((s) => new Set(s).add(id));
+    try {
+      const res = await fetch(`/api/resources/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json?.error || res.statusText);
+      }
+      toast.success("Resource deleted");
+    } catch (e) {
+      // rollback
+      setRecent(prev);
+      toast.error(`Delete failed: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setDeletingIds((s) => {
+        const copy = new Set(s);
+        copy.delete(id);
+        return copy;
+      });
+    }
+  }
+
+  async function clearAll() {
+    if (!window.confirm("Are you sure you want to delete all resources?")) return;
+    const prev = recent;
+    setClearing(true);
+    // optimistic clear
+    setRecent([]);
+    try {
+      const res = await fetch("/api/resources", { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json?.error || res.statusText);
+      }
+      toast.success("All resources cleared");
+    } catch (e) {
+      // rollback
+      setRecent(prev);
+      toast.error(`Clear failed: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setClearing(false);
     }
   }
 
@@ -235,13 +288,24 @@ export default function Home() {
             <h2 className="text-base font-semibold text-neutral-800 dark:text-neutral-100">
               Recent sources
             </h2>
-            <button
-              onClick={loadRecent}
-              className="text-xs px-2 py-1 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700"
-              disabled={recentLoading}
-            >
-              {recentLoading ? "Refreshing…" : "Refresh"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={loadRecent}
+                className="text-xs px-2 py-1 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                disabled={recentLoading || clearing}
+                title="Refresh list"
+              >
+                {recentLoading ? "Refreshing…" : "Refresh"}
+              </button>
+              <button
+                onClick={clearAll}
+                className="text-xs px-2 py-1 rounded-lg border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
+                disabled={clearing || recentLoading || recent.length === 0}
+                title="Delete all resources"
+              >
+                {clearing ? "Clearing…" : "Clear all"}
+              </button>
+            </div>
           </div>
           <ul className="space-y-3">
             {recent.length === 0 ? (
@@ -263,9 +327,19 @@ export default function Home() {
                         {new Date(r.created_at).toLocaleString()}
                       </div>
                     </div>
-                    <span className="shrink-0 text-xs px-2 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700">
-                      {r.chunks} chunks
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs px-2 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700">
+                        {r.chunks} chunks
+                      </span>
+                      <button
+                        className="text-xs px-2 py-0.5 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
+                        onClick={() => deleteResource(r.resourceId)}
+                        disabled={deletingIds.has(r.resourceId) || clearing}
+                        title="Delete this resource"
+                      >
+                        {deletingIds.has(r.resourceId) ? "…" : "❌"}
+                      </button>
+                    </div>
                   </div>
                 </li>
               ))
