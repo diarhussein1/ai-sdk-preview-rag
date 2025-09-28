@@ -1,13 +1,13 @@
 Pdf dependency toegevoegd voor ingest deel: 
-npm i pdf-parse
+npm i pdf-parse /
 npm i pdfjs-dist@3
 
 
 docker run --name rag-pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=rag -p 5432:5432 -d ankane/pgvector:latest
 
-docker exec -it rag-pg psql -U postgres -d rag \                        50s
-  -c "ALTER TABLE resources ADD COLUMN IF NOT EXISTS filename TEXT;"
+docker exec -it rag-pg psql -U postgres -d rag -c "ALTER TABLE resources ADD COLUMN filename TEXT;"
+
 
   Env file:
 
@@ -21,5 +21,5 @@ npm install
 npm run db:migrate
 npm run dev
 
-open http://localhost:3000 en http://localhost:3000/upload
+open http://localhost:3000 
 
