@@ -32,7 +32,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className={`w-10 h-10 rounded-md flex items-center justify-center transition-all ${
+      className={`w-10 h-10 rounded-md flex items-center justify-center transition-all border-0 outline-none focus:outline-none ${
         theme === 'dark' 
           ? 'text-white hover:bg-gray-700' 
           : 'text-gray-600 hover:bg-gray-200'

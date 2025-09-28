@@ -22,7 +22,7 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 ### 1.1 Chat Session Management
 - [ ] Chat History Persistence: Save conversations to database
 - [ ] Multiple Chat Tabs: Create, switch, and manage multiple conversations  
-- [ ] Chat Naming: Auto-generate or manually set chat titles
+- [ ] Chat Naming: Auto-generate chat names and manually possibility rename of chats
 - [ ] Chat Deletion: Remove individual conversations
 - [ ] Session Recovery: Restore chat state on page reload
 
@@ -65,7 +65,7 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 
 ### 3.1 Enhanced File Handling
 
-- [ ] **Document Preview**: PDF preview in sidebar met thumbnail
+- [ ] **Document Preview**: PDF preview 
 - [ ] **Batch Upload**: Meerdere files tegelijk uploaden
 - [ ] **Document Categories**: Organiseer uploads in folders/tags
 - [ ] **Version Control**: Track document updates en wijzigingen
@@ -105,18 +105,13 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 ## FASE 5: COLLABORATION \& SHARING 
 
 ### 5.1 Real-time Features
-
-- [ ] **Real-time Collaboration**: Multiple users in één chat
-- [ ] **Conversation Sharing**: Deel gesprekken met anderen
-- [ ] **Live Cursors**: Zie waar anderen aan het typen zijn
-- [ ] **Presence Indicators**: Online/offline status
 - [ ] **Comment System**: Notities aan berichten toevoegen
 
 
 ### 5.2 Integration Features
 
-- [ ] **Google Drive Connector**: Import documents van Drive
-- [ ] **Dropbox Integration**: Sync met cloud storage
+- [ ] **Platform Integraties**: documents van bijv. Google Drive, sharepoint, Github repo's etc etc etc etc etc
+- [ ] **Dropbox Integration**: Sync met cloud storage (azure?)
 - [ ] **Slack Integration**: Export conversations naar Slack
 - [ ] **API Endpoints**: RESTful API voor externe integratie
 - [ ] **Webhook Support**: Real-time notificaties naar externe systemen

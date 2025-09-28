@@ -6,6 +6,11 @@ import { ThemeProvider } from "@/lib/theme-context";
 export const metadata: Metadata = {
   title: "AI Assistant",
   description: "Ask questions, get answers from your documents",
+  icons: {
+    icon: "/logo.jpeg",
+    shortcut: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
