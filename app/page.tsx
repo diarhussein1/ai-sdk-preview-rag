@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client";
 
 import React, { useMemo, useRef, useState, useEffect } from "react";
@@ -20,11 +19,10 @@ function Logo() {
   );
 }
 
-// ✨ Updated: sluit aan op /api/ingest/recent en ingest-response
 type RecentItem = {
   resourceId: string;
   filename: string | null;
-  created_at: string; // ISO
+  created_at: string;
   chunks: number;
 };
 
@@ -35,7 +33,6 @@ type IngestResponse = {
 };
 
 export default function Home() {
-  // --- Chat wiring
   const [toolCall, setToolCall] = useState<string>();
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
@@ -78,7 +75,6 @@ export default function Home() {
     .filter((m) => m.role !== "user")
     .slice(-1)[0];
 
-  // --- Upload wiring
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -97,7 +93,6 @@ export default function Home() {
         throw new Error((json as any)?.error || res.statusText);
       }
 
-      // Refresh “recent”
       await loadRecent();
       return json;
     };
@@ -105,7 +100,6 @@ export default function Home() {
     await toast.promise(doUpload(), {
       loading: "Uploading & ingesting…",
       success: (json: IngestResponse) => {
-        // Mooie samenvatting per bestand
         const lines =
           json.files?.length
             ? json.files
@@ -122,7 +116,6 @@ export default function Home() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
-  // --- Recent sources
   const [recent, setRecent] = useState<RecentItem[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -141,9 +134,7 @@ export default function Home() {
     }
   }
 
-  // --- Deletion helpers
   async function deleteResource(id: string) {
-    // optimistic remove
     const prev = recent;
     const next = prev.filter((r) => r.resourceId !== id);
     setRecent(next);
@@ -158,7 +149,6 @@ export default function Home() {
       }
       toast.success("Resource deleted");
     } catch (e) {
-      // rollback
       setRecent(prev);
       toast.error(`Delete failed: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
@@ -174,7 +164,6 @@ export default function Home() {
     if (!window.confirm("Are you sure you want to delete all resources?")) return;
     const prev = recent;
     setClearing(true);
-    // optimistic clear
     setRecent([]);
     try {
       const res = await fetch("/api/resources", { method: "DELETE" });
@@ -184,7 +173,6 @@ export default function Home() {
       }
       toast.success("All resources cleared");
     } catch (e) {
-      // rollback
       setRecent(prev);
       toast.error(`Clear failed: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
@@ -198,7 +186,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full px-4 sm:px-6 md:px-8 py-6 sm:py-10">
-      {/* Header */}
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <Logo />
         <div className="flex items-center gap-2">
@@ -222,9 +209,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Content grid */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {/* Chat card */}
         <div className="lg:col-span-2">
           <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-800/70 shadow-sm p-4 sm:p-5">
             <form
@@ -282,7 +267,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Sources / recent list */}
         <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-800/70 shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-neutral-800 dark:text-neutral-100">

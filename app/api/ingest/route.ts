@@ -1,4 +1,3 @@
-// app/api/ingest/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { embeddings as embeddingsTable } from "@/lib/db/schema/embeddings";
@@ -11,14 +10,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-/* ---------- helpers ---------- */
 async function fileToBuffer(file: File): Promise<Buffer> {
   if (typeof file.arrayBuffer === "function") {
     return Buffer.from(await file.arrayBuffer());
   }
-  // @ts-ignore - fallback
   if (typeof file.stream === "function") {
-    // @ts-ignore
     return Buffer.from(await new Response(file.stream()).arrayBuffer());
   }
   throw new Error("Unsupported file object (no arrayBuffer/stream).");
@@ -31,7 +27,6 @@ function chunk(text: string, size = 800, overlap = 100): string[] {
   return out;
 }
 
-// pdf.js v3 legacy (gebruik next.config.mjs -> canvas: false fallback)
 async function extractPdfText(buf: Buffer) {
   const pdfjs: any = await import("pdfjs-dist/legacy/build/pdf.js");
   if (pdfjs.GlobalWorkerOptions) {
@@ -57,8 +52,6 @@ async function textFromFile(file: File) {
   if (name.endsWith(".pdf")) return await extractPdfText(buf);
   return buf.toString("utf-8").trim();
 }
-/* ---------- /helpers ---------- */
-
 export async function POST(req: Request) {
   try {
     const ct = req.headers.get("content-type") || "";
@@ -92,9 +85,8 @@ export async function POST(req: Request) {
         continue;
       }
 
-      // Embed alle chunks
       const { embeddings } = await embedMany({
-        model: openai.embedding("text-embedding-3-small"), // 1536 dims
+        model: openai.embedding("text-embedding-3-small"),
         values: chunks,
       });
       if (embeddings.length !== chunks.length) {
@@ -104,7 +96,6 @@ export async function POST(req: Request) {
         );
       }
 
-      // ⬇️ Raw SQL INSERT om filename 100% te persistieren
       const newId = nanoid();
       await db.execute(sql`
         INSERT INTO resources (id, content, filename)
@@ -112,11 +103,10 @@ export async function POST(req: Request) {
       `);
       const resRow = { id: newId };
 
-      // Embeddings per chunk gelinkt aan resourceId
       const rows = chunks.map((content, i) => ({
         resourceId: resRow.id,
-        content,                 // NOT NULL in jouw schema
-        embedding: embeddings[i] // pgvector kolom (↔ pas naar 'vector' als jouw kolom zo heet)
+        content,
+        embedding: embeddings[i]
       }));
       await db.insert(embeddingsTable).values(rows);
 

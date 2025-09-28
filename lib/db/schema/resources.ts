@@ -19,7 +19,6 @@ export const resources = pgTable("resources", {
     .default(sql`now()`),
 });
 
-// Schema for resources - used to validate API requests
 export const insertResourceSchema = createSelectSchema(resources)
   .extend({})
   .omit({
@@ -28,5 +27,4 @@ export const insertResourceSchema = createSelectSchema(resources)
     updatedAt: true,
   });
 
-// Type for resources - used to type API request params and within Components
 export type NewResourceParams = z.infer<typeof insertResourceSchema>;

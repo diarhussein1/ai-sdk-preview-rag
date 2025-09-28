@@ -1,4 +1,3 @@
-// app/api/resources/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { resources } from "@/lib/db/schema/resources";
