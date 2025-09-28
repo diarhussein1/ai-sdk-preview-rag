@@ -13,6 +13,16 @@
     --perplexity-text-tertiary: #999999;
   }
 
+  :root[data-theme="dark"], .dark {
+    --perplexity-teal: #2DD4BF;
+    --perplexity-bg: #0F0F0F;
+    --perplexity-gray-50: #1A1A1A;
+    --perplexity-gray-200: #2A2A2A;
+    --perplexity-text-primary: #FFFFFF;
+    --perplexity-text-secondary: #B3B3B3;
+    --perplexity-text-tertiary: #808080;
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -182,6 +192,69 @@
     
     .perplexity-input {
       font-size: 16px;
+    }
+  }
+
+  /* Theme Toggle Styles */
+  .theme-toggle {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: var(--perplexity-text-primary);
+  }
+
+  .theme-toggle:hover {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+
+  .theme-toggle:active {
+    transform: scale(0.95);
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--perplexity-teal);
+    outline-offset: 2px;
+  }
+
+  .theme-toggle.dark {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .theme-toggle-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .theme-toggle-icon.rotate {
+    transform: rotate(180deg);
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .theme-toggle {
+      bottom: 16px;
+      left: 16px;
+      width: 44px;
+      height: 44px;
     }
   }
 }

@@ -5,6 +5,7 @@ import { useChat, Message } from "ai/react";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown, { Options } from "react-markdown";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function Logo() {
   return (
@@ -188,7 +189,7 @@ export default function Home() {
   const [showSourcesPanel, setShowSourcesPanel] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen flex" style={{ background: 'var(--perplexity-bg)' }}>
       {/* Hidden file input - accessible from anywhere */}
       <input
         ref={fileInputRef}
@@ -201,7 +202,8 @@ export default function Home() {
       />
       
       {/* Left Sidebar */}
-      <div className="w-16 bg-gray-50 border-r" style={{ borderColor: 'var(--perplexity-gray-200)' }}>
+      <div className="w-16 border-r flex flex-col" style={{ background: 'var(--perplexity-gray-50)', borderColor: 'var(--perplexity-gray-200)' }}>
+        {/* Top section with main buttons */}
         <div className="flex flex-col items-center py-4 space-y-3">
           {/* Home Tab */}
           <button
@@ -267,6 +269,11 @@ export default function Home() {
               </svg>
             )}
           </button>
+        </div>
+
+        {/* Theme Toggle Button - Pushed to absolute bottom */}
+        <div className="mt-auto mb-4 flex justify-center">
+          <ThemeToggle />
         </div>
       </div>
 
