@@ -3,16 +3,25 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "IntraBot",
-  description: "Private RAG • Ingest + Chat",
+  title: "AI Assistant",
+  description: "Ask questions, get answers from your documents",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-neutral-50 dark:bg-neutral-900">
+      <body>
         {children}
-        <Toaster richColors closeButton expand position="top-right" />
+        <Toaster 
+          position="top-center" 
+          toastOptions={{
+            style: {
+              background: 'var(--perplexity-bg)',
+              border: '1px solid var(--perplexity-gray-200)',
+              color: 'var(--perplexity-text-primary)',
+            },
+          }}
+        />
       </body>
     </html>
   );

@@ -185,150 +185,153 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full px-4 sm:px-6 md:px-8 py-6 sm:py-10">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="px-4 py-2 rounded-xl shadow border border-neutral-200 dark:border-neutral-700 bg-neutral-900 text-white dark:bg-white dark:text-black hover:opacity-90 transition"
-            title="Upload & ingest documents"
-          >
-            {uploading ? "Uploading…" : "Upload"}
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            name="files"
-            multiple
-            accept=".txt,.md,.pdf"
-            className="hidden"
-            onChange={(e) => uploadFiles(e.currentTarget.files)}
-          />
+    <div className="min-h-screen bg-white">
+      <div className="perplexity-container py-8">
+        <div className="text-center py-12 mb-8">
+          <h1 className="text-4xl font-medium mb-4" style={{ color: 'var(--perplexity-text-primary)' }}>
+            AI Chupapi Assistant
+          </h1>
+          <p className="text-lg mb-8" style={{ color: 'var(--perplexity-text-secondary)' }}>
+            Upload documents and ask questions
+          </p>
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <div className="lg:col-span-2">
-          <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-800/70 shadow-sm p-4 sm:p-5">
-            <form
-              onSubmit={handleSubmit}
-              className="flex items-center gap-2 sticky top-4 z-10"
-            >
+        <div className="max-w-2xl mx-auto mb-12">
+          <form onSubmit={handleSubmit} className="mb-8">
+            <div className="relative">
               <input
-                className="bg-white dark:bg-neutral-700 dark:placeholder:text-neutral-400 dark:text-neutral-100 text-base w-full rounded-xl border border-neutral-200 dark:border-neutral-700 px-4 py-2"
+                className="perplexity-input pr-20"
                 minLength={3}
                 required
                 value={input}
-                placeholder="Ask me anything about your docs…"
+                placeholder="Ask anything..."
                 onChange={handleInputChange}
+                disabled={isLoading}
               />
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-xl shadow border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 hover:opacity-90 transition"
-              >
-                Send
-              </button>
-            </form>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="perplexity-button-tertiary text-sm"
+                  title="Upload documents"
+                >
+                  {uploading ? "..." : "📎"}
+                </button>
+                <button
+                  type="submit"
+                  className="perplexity-button-primary text-sm"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "..." : "Ask"}
+                </button>
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              name="files"
+              multiple
+              accept=".txt,.md,.pdf"
+              className="hidden"
+              onChange={(e) => uploadFiles(e.currentTarget.files)}
+            />
+          </form>
 
-            <motion.div
-              animate={{ paddingTop: isExpanded ? 12 : 0 }}
-              transition={{ type: "spring", bounce: 0.5 }}
-              className="mt-4"
-            >
-              <AnimatePresence>
-                {awaitingResponse || currentToolCall ? (
-                  <div className="px-1 min-h-12">
-                    {userQuery?.content && (
-                      <div className="dark:text-neutral-400 text-neutral-500 text-sm w-fit mb-1">
-                        {userQuery.content}
-                      </div>
-                    )}
-                    <Loading tool={currentToolCall} />
-                  </div>
-                ) : lastAssistantMessage ? (
-                  <div className="px-1 min-h-12">
-                    {userQuery?.content && (
-                      <div className="dark:text-neutral-400 text-neutral-500 text-sm w-fit mb-1">
-                        {userQuery.content}
-                      </div>
-                    )}
-                    <AssistantMessage message={lastAssistantMessage} />
-                  </div>
-                ) : (
-                  <div className="text-sm text-neutral-500 dark:text-neutral-400">
-                    Upload eerst één of meer documenten en stel daarna vragen
-                    over de inhoud. Ondersteund: TXT / MD / PDF.
+          <AnimatePresence>
+            {(awaitingResponse || currentToolCall || lastAssistantMessage) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="mb-8"
+              >
+                {userQuery?.content && (
+                  <div className="mb-6">
+                    <div className="text-sm font-medium mb-2" style={{ color: 'var(--perplexity-text-secondary)' }}>
+                      Question
+                    </div>
+                    <div style={{ color: 'var(--perplexity-text-primary)' }}>
+                      {userQuery.content}
+                    </div>
                   </div>
                 )}
-              </AnimatePresence>
-            </motion.div>
-          </div>
+                
+                <div>
+                  <div className="text-sm font-medium mb-2" style={{ color: 'var(--perplexity-text-secondary)' }}>
+                    Answer
+                  </div>
+                  {awaitingResponse || currentToolCall ? (
+                    <Loading tool={currentToolCall} />
+                  ) : lastAssistantMessage ? (
+                    <AssistantMessage message={lastAssistantMessage} />
+                  ) : null}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-800/70 shadow-sm p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold text-neutral-800 dark:text-neutral-100">
-              Recent sources
-            </h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={loadRecent}
-                className="text-xs px-2 py-1 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                disabled={recentLoading || clearing}
-                title="Refresh list"
-              >
-                {recentLoading ? "Refreshing…" : "Refresh"}
-              </button>
-              <button
-                onClick={clearAll}
-                className="text-xs px-2 py-1 rounded-lg border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
-                disabled={clearing || recentLoading || recent.length === 0}
-                title="Delete all resources"
-              >
-                {clearing ? "Clearing…" : "Clear all"}
-              </button>
-            </div>
-          </div>
-          <ul className="space-y-3">
-            {recent.length === 0 ? (
-              <li className="text-sm text-neutral-500 dark:text-neutral-400">
-                Nog geen bronnen gevonden.
-              </li>
-            ) : (
-              recent.map((r) => (
-                <li
-                  key={r.resourceId}
-                  className="p-3 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
-                        {r.filename ?? "(unknown file)"}
+        <div className="max-w-2xl mx-auto">
+          {recent.length > 0 ? (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-medium" style={{ color: 'var(--perplexity-text-primary)' }}>
+                  Documents ({recent.length})
+                </h2>
+                <div className="flex gap-3">
+                  <button
+                    onClick={loadRecent}
+                    className="perplexity-button-tertiary text-sm"
+                    disabled={recentLoading || clearing}
+                  >
+                    {recentLoading ? "Refreshing..." : "Refresh"}
+                  </button>
+                  <button
+                    onClick={clearAll}
+                    className="perplexity-button-tertiary text-sm"
+                    style={{ color: 'var(--perplexity-text-tertiary)' }}
+                    disabled={clearing || recentLoading || recent.length === 0}
+                  >
+                    {clearing ? "Removing..." : "Remove all"}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {recent.map((r) => (
+                  <div
+                    key={r.resourceId}
+                    className="flex items-center justify-between py-3 px-0 border-b"
+                    style={{ borderColor: 'var(--perplexity-gray-50)' }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate" style={{ color: 'var(--perplexity-text-primary)' }}>
+                        {r.filename ?? "Untitled"}
                       </div>
-                      <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                        {new Date(r.created_at).toLocaleString()}
+                      <div className="text-sm mt-1" style={{ color: 'var(--perplexity-text-secondary)' }}>
+                        {r.chunks} chunks • {new Date(r.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs px-2 py-0.5 rounded-md border border-neutral-200 dark:border-neutral-700">
-                        {r.chunks} chunks
-                      </span>
-                      <button
-                        className="text-xs px-2 py-0.5 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30"
-                        onClick={() => deleteResource(r.resourceId)}
-                        disabled={deletingIds.has(r.resourceId) || clearing}
-                        title="Delete this resource"
-                      >
-                        {deletingIds.has(r.resourceId) ? "…" : "❌"}
-                      </button>
-                    </div>
+                    <button
+                      className="perplexity-button-tertiary text-sm ml-4"
+                      onClick={() => deleteResource(r.resourceId)}
+                      disabled={deletingIds.has(r.resourceId) || clearing}
+                      style={{ color: 'var(--perplexity-text-tertiary)' }}
+                    >
+                      {deletingIds.has(r.resourceId) ? "..." : "Remove"}
+                    </button>
                   </div>
-                </li>
-              ))
-            )}
-          </ul>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-sm" style={{ color: 'var(--perplexity-text-tertiary)' }}>
+                No documents uploaded yet. Use the 📎 button above to upload your first document.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -338,52 +341,49 @@ export default function Home() {
 function Loading({ tool }: { tool?: string }) {
   const toolName =
     tool === "getInformation"
-      ? "Getting information"
+      ? "Searching documents"
       : tool === "addResource"
-        ? "Adding information"
+        ? "Processing information"
         : "Thinking";
+        
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ type: "spring" }}
-        className="overflow-hidden flex justify-start items-center"
-      >
-        <div className="flex flex-row gap-2 items-center">
-          <div className="animate-spin text-neutral-500 dark:text-neutral-400">
-            <svg className="size-5" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
-              <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-            </svg>
-          </div>
-          <div className="text-neutral-500 dark:text-neutral-400 text-sm">
-            {toolName}...
-          </div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+    <div className="perplexity-loading">
+      <div className="flex items-center gap-3">
+        <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" 
+             style={{ color: 'var(--perplexity-teal)' }}></div>
+        <span style={{ color: 'var(--perplexity-text-secondary)' }}>
+          {toolName}...
+        </span>
+      </div>
+    </div>
   );
 }
 
 const AssistantMessage = ({ message }: { message: Message | undefined }) => {
   if (message === undefined) return null;
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={message.id}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="whitespace-pre-wrap font-mono text-sm text-neutral-800 dark:text-neutral-200 overflow-hidden"
-        id="markdown"
+    <div style={{ color: 'var(--perplexity-text-primary)' }}>
+      <MemoizedReactMarkdown
+        components={{
+          code: ({ node, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '');
+            return (
+              <code className="perplexity-code" {...props}>
+                {children}
+              </code>
+            );
+          },
+          pre: ({ children }) => <div className="perplexity-code">{children}</div>,
+          a: ({ href, children }) => (
+            <a href={href} className="perplexity-citation" target="_blank" rel="noopener noreferrer">
+              {children}
+            </a>
+          ),
+        }}
       >
-        <MemoizedReactMarkdown className="max-h-72 overflow-y-auto">
-          {message.content}
-        </MemoizedReactMarkdown>
-      </motion.div>
-    </AnimatePresence>
+        {message.content}
+      </MemoizedReactMarkdown>
+    </div>
   );
 };
 
