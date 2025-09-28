@@ -1,4 +1,3 @@
-// app/api/resources/[id]/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { resources } from "@/lib/db/schema/resources";
@@ -9,10 +8,10 @@ export const dynamic = "force-dynamic";
 
 export async function DELETE(
   _req: Request,
-  ctx: { params: { id?: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const id = ctx?.params?.id;
+    const { id } = await params;
     if (!id) {
       return NextResponse.json({ error: "Missing resource id" }, { status: 400 });
     }

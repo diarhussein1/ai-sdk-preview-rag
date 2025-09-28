@@ -1,4 +1,3 @@
-// app/api/ingest/recent/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
@@ -10,7 +9,6 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const limit = Math.min(parseInt(searchParams.get("limit") || "12", 10), 50);
 
-  // Use raw SQL to avoid Drizzle's result-mapper issues
   const result = await db.execute(sql<
     {
       resourceId: string;
@@ -31,9 +29,7 @@ export async function GET(req: Request) {
     LIMIT ${limit}
   `);
 
-  // drizzle-orm returns { rows } on execute()
-  // @ts-ignore - types differ per version
-  const items = result.rows ?? result;
+  const items = (result as any).rows ?? result;
 
   return NextResponse.json({ items });
 }
