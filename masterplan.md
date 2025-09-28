@@ -11,6 +11,33 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 - **Database**: PostgreSQL met DrizzleORM en pgvector extensie
 - **Storage**: Vector embeddings voor document retrieval
 - **File Processing**: PDF-parse, pdfjs-dist voor document ingest
+- **UI Components**: Framer Motion, Sonner toasts, React Markdown
+- **Theming**: Dark/Light mode support with CSS variables
+- **State Management**: React Context for theme and chat state
+
+***
+
+## FASE 1: CORE CHAT FUNCTIONALITY
+
+### 1.1 Chat Session Management
+- [ ] Chat History Persistence: Save conversations to database
+- [ ] Multiple Chat Tabs: Create, switch, and manage multiple conversations  
+- [ ] Chat Naming: Auto-generate chat names and manually possibility rename of chats
+- [ ] Chat Deletion: Remove individual conversations
+- [ ] Session Recovery: Restore chat state on page reload
+
+### 1.2 Message Management
+- [ ] Message Threading: Proper conversation flow with message IDs
+- [ ] Message Timestamps: Show when messages were sent
+- [ ] Message Status: Delivery and read indicators
+- [ ] Message Editing: Edit user messages and regenerate responses
+- [ ] Message Copying: Copy individual messages to clipboard
+
+### 1.3 Basic UI Improvements
+- [ ] Chat Sidebar: List of all conversations with preview
+- [ ] Message Formatting: Better markdown rendering and code highlighting
+- [ ] Scroll Management: Auto-scroll and scroll-to-bottom functionality
+- [ ] Input Enhancements: Multi-line input with Shift+Enter support
 
 ***
 
@@ -38,7 +65,7 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 
 ### 3.1 Enhanced File Handling
 
-- [ ] **Document Preview**: PDF preview in sidebar met thumbnail
+- [ ] **Document Preview**: PDF preview 
 - [ ] **Batch Upload**: Meerdere files tegelijk uploaden
 - [ ] **Document Categories**: Organiseer uploads in folders/tags
 - [ ] **Version Control**: Track document updates en wijzigingen
@@ -78,18 +105,13 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 ## FASE 5: COLLABORATION \& SHARING 
 
 ### 5.1 Real-time Features
-
-- [ ] **Real-time Collaboration**: Multiple users in één chat
-- [ ] **Conversation Sharing**: Deel gesprekken met anderen
-- [ ] **Live Cursors**: Zie waar anderen aan het typen zijn
-- [ ] **Presence Indicators**: Online/offline status
 - [ ] **Comment System**: Notities aan berichten toevoegen
 
 
 ### 5.2 Integration Features
 
-- [ ] **Google Drive Connector**: Import documents van Drive
-- [ ] **Dropbox Integration**: Sync met cloud storage
+- [ ] **Platform Integraties**: documents van bijv. Google Drive, sharepoint, Github repo's etc etc etc etc etc
+- [ ] **Dropbox Integration**: Sync met cloud storage (azure?)
 - [ ] **Slack Integration**: Export conversations naar Slack
 - [ ] **API Endpoints**: RESTful API voor externe integratie
 - [ ] **Webhook Support**: Real-time notificaties naar externe systemen
