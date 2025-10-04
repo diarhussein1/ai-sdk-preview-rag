@@ -9,8 +9,8 @@ permissions:
   id-token: write
 
 env:
-  IMAGE_SEMVER: "${{ vars.ECR_IMAGE_SEMVER || '1.0.0' }}"
-  IMAGE_NAME: "${{ vars.IMAGE_NAME || 'my-app' }}"
+  IMAGE_SEMVER: "${{ vars.ECR_IMAGE_SEMVER }}"
+  IMAGE_NAME: "${{ vars.IMAGE_NAME }}"
   REGISTRY: "ghcr.io"
   REPOSITORY: "${{ github.repository }}"
 
@@ -48,11 +48,11 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}:${{ vars.ECR_IMAGE_SEMVER }}
+            ghcr.io/${{ github.repository }}:${{ vars.IMAGE_SEMVER }}
             ghcr.io/${{ github.repository }}:${{ env.NEW_VERSION }}
           images: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}:${{ vars.ECR_IMAGE_SEMVER }}
+            ghcr.io/${{ github.repository }}:${{ vars.IMAGE_SEMVER }}
             ghcr.io/${{ github.repository }}:${{ env.NEW_VERSION }}
 
       - name: Update Repository Variable
