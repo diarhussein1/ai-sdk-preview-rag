@@ -50,10 +50,6 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:${{ vars.IMAGE_SEMVER }}
             ghcr.io/${{ github.repository }}:${{ env.NEW_VERSION }}
-          images: |
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}:${{ vars.IMAGE_SEMVER }}
-            ghcr.io/${{ github.repository }}:${{ env.NEW_VERSION }}
 
       - name: Update Repository Variable
         env:
