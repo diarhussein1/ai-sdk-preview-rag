@@ -1,0 +1,65 @@
+name: Build and Push Docker Image
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  GH_PAT: "${{ secrets.GH_PAT }}"
+  IMAGE_SEMVER: "${{ vars.ECR_IMAGE_SEMVER || '1.0.0' }}"
+  IMAGE_NAME: "${{ vars.IMAGE_NAME || 'my-app' }}"
+  REGISTRY: "ghcr.io"
+  REPOSITORY: "${{ github.repository }}"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Bump patch version
+        if: github.event.pull_request.merged == true
+        id: bump
+        run: |
+          OLD_VERSION="${IMAGE_SEMVER}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$OLD_VERSION"
+          NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "Bumped version: $OLD_VERSION → $NEW_VERSION"
+
+      - name: Log in to GitHub Container Registry
+        if: github.event.pull_request.merged == true
+        run: |
+          echo "${GH_PAT}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build Docker Image
+        if: github.event.pull_request.merged == true
+        run: |
+          IMAGE_URI="${REGISTRY}/${REPOSITORY,,}/${IMAGE_NAME}"
+          echo "Building $IMAGE_URI..."
+          docker build -t "${IMAGE_URI}:latest" .
+          docker tag "${IMAGE_URI}:latest" "${IMAGE_URI}:${IMAGE_SEMVER}"
+          docker tag "${IMAGE_URI}:latest" "${IMAGE_URI}:${NEW_VERSION}"
+          echo "IMAGE_URI=${IMAGE_URI}" >> $GITHUB_ENV
+
+      - name: Push Docker Image
+        if: github.event.pull_request.merged == true
+        run: |
+          docker push "${IMAGE_URI}:latest"
+          docker push "${IMAGE_URI}:${IMAGE_SEMVER}"
+          docker push "${IMAGE_URI}:${NEW_VERSION}"
+
+      - name: Update Repository Variable
+        if: github.event.pull_request.merged == true
+        env:
+          GH_TOKEN: ${{ env.GH_PAT }}
+        run: |
+          gh variable set ECR_IMAGE_SEMVER --body "$NEW_VERSION" --repo "$GITHUB_REPOSITORY"
