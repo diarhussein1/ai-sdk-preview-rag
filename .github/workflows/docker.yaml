@@ -9,7 +9,6 @@ permissions:
   id-token: write
 
 env:
-  GH_PAT: "${{ secrets.GH_PAT }}"
   IMAGE_SEMVER: "${{ vars.ECR_IMAGE_SEMVER || '1.0.0' }}"
   IMAGE_NAME: "${{ vars.IMAGE_NAME || 'my-app' }}"
   REGISTRY: "ghcr.io"
@@ -40,7 +39,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ env.GH_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Image
         uses: docker/build-push-action@v5
