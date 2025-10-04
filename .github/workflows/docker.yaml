@@ -45,7 +45,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          token: ${{ secrets.GH_PAT }}
+          password: ${{ secrets.GH_PAT }}
 
       - name: Build Docker Image
         if: github.event.pull_request.merged == true
