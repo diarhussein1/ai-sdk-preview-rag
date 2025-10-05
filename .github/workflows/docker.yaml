@@ -13,6 +13,7 @@ env:
   IMAGE_NAME: "${{ vars.IMAGE_NAME }}"
   REGISTRY: "ghcr.io"
   REPOSITORY: "${{ github.repository }}"
+  GH_PAT: ${{ secrets.GH_PAT }}
 
 jobs:
   build-and-push:
@@ -53,6 +54,6 @@ jobs:
 
       - name: Update Repository Variable
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           gh variable set ECR_IMAGE_SEMVER --body "$NEW_VERSION" --repo "$GITHUB_REPOSITORY"
