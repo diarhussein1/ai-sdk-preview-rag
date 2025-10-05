@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "tsx lib/db/migrate.ts && next build",
+    "build": "next build",
+    "migrate": "tsx lib/db/migrate.ts",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",

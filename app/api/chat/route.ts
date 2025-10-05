@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { openai } from "@ai-sdk/openai";
 import { embed, streamText } from "ai";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
+const db = getDb();
 import { sql } from "drizzle-orm";
 
 export const maxDuration = 30;
@@ -31,7 +32,7 @@ async function retrieveTopK(query: string, k = 20): Promise<Hit[]> {
     JOIN resources r ON r.id = e.resource_id
     ORDER BY e.embedding <=> ${JSON.stringify(embedding)}::vector
     LIMIT ${k}
-  `);  
+  `);
 
   const rows = (result as any).rows ?? result;
   return rows as Hit[];
@@ -57,7 +58,7 @@ export async function POST(req: Request) {
   const system = `
   Beantwoord zoveel mogelijk op basis van onderstaande context.
   Als de context niet volledig genoeg is, combineer aanwijzingen of geef een
-  waarschijnlijk antwoord. Alleen als er echt niets bruikbaars in staat, zeg: "Sorry, ik weet het niet."  
+  waarschijnlijk antwoord. Alleen als er echt niets bruikbaars in staat, zeg: "Sorry, ik weet het niet."
 `;
 
   const result = streamText({

@@ -6,7 +6,6 @@ let dbInstance: ReturnType<typeof drizzle> | null = null;
 
 export function getDb() {
   if (!dbInstance) {
-    // Only connect when this is actually called (runtime)
     if (!env.DATABASE_URL) {
       throw new Error("DATABASE_URL is not defined");
     }
@@ -15,3 +14,6 @@ export function getDb() {
   }
   return dbInstance;
 }
+
+// backward-compat export for existing imports
+export const db = getDb();
