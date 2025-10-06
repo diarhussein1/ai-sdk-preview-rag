@@ -16,6 +16,7 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 RUN npm ci --omit=dev
+RUN npm install -g tsx
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
