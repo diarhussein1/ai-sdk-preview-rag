@@ -1,0 +1,307 @@
+# Project Context: RAG AI Chatbot
+
+## 🎨 Design System - ALTIJD HANDHAVEN
+
+### Kleuren (CSS Variables)
+**Light Mode:**
+- Primary Brand: `--perplexity-teal: #21808D`
+- Background: `--perplexity-bg: #FFFFFF`
+- Gray 50: `--perplexity-gray-50: #F8F9FA`
+- Gray 200: `--perplexity-gray-200: #E8E8E8`
+- Text Primary: `--perplexity-text-primary: #1A1A1A`
+- Text Secondary: `--perplexity-text-secondary: #666666`
+- Text Tertiary: `--perplexity-text-tertiary: #999999`
+
+**Dark Mode:**
+- Primary Brand: `--perplexity-teal: #2DD4BF`
+- Background: `--perplexity-bg: #0F0F0F`
+- Gray 50: `--perplexity-gray-50: #1A1A1A`
+- Gray 200: `--perplexity-gray-200: #2A2A2A`
+- Text Primary: `--perplexity-text-primary: #FFFFFF`
+- Text Secondary: `--perplexity-text-secondary: #B3B3B3`
+- Text Tertiary: `--perplexity-text-tertiary: #808080`
+
+### Typography
+- Font Family: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', system-ui, sans-serif`
+- Font Weight: 400 (body), 500 (headings, buttons)
+- Line Height: 1.5 (body), 1.3 (headings)
+- Letter Spacing: -0.01em (subtiel tighter)
+- Font Smoothing: antialiased
+
+### Spacing & Layout
+- Sidebar Width: `64px` (w-16)
+- Border Radius: `8px` (buttons), `24px` (inputs), `12px` (cards)
+- Transitions: `150ms cubic-bezier(0.4, 0, 0.2, 1)`
+- Shadows: Minimal, only on hover/active states
+
+### Components
+
+**Buttons:**
+- Primary: `background: var(--perplexity-teal)`, `border-radius: 8px`, `padding: 8px 16px`
+- Hover: Slightly darker shade
+- Focus: 2px outline met teal kleur
+
+**Inputs:**
+- Border Radius: `24px` (rounded-3xl)
+- Border: `1px solid var(--perplexity-gray-200)`
+- Background: `var(--perplexity-gray-50)`
+- Padding: `12px 20px`
+- Focus: teal border + subtle shadow
+- **Fixed Bottom Input**: `sticky bottom-0`, border-top, textarea auto-resize
+- **Input Buttons**: Focus (circle icon), Attach (paperclip), Submit (arrow)
+- Submit button: teal background when text present, gray when empty
+
+**Chat Separators:**
+- Use horizontal line after each Answer (except last)
+- Height: `h-px` (1px)
+- Color: `var(--perplexity-gray-200)`
+- Spacing: `mt-8 mb-4` (generous spacing)
+- Pattern: Question → Answer → ──── → Question → Answer → ────
+
+**Icons (Left Sidebar):**
+- Size: `w-10 h-10` (40x40px container)
+- Icon Size: `18px` (width/height)
+- Style: Outline/stroke icons (geen filled icons)
+- Stroke Width: `2px`
+- Colors: `text-gray-600` (hover: `text-gray-800`)
+- Hover State: `hover:bg-gray-200` (light) / `hover:bg-gray-800` (dark)
+- Border Radius: `rounded-md` (6px)
+- Center Alignment: `flex items-center justify-center`
+- SVG Format: Gebruik `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`
+
+**Example Icon Pattern:**
+```tsx
+<button className="w-10 h-10 rounded-md flex items-center justify-center transition-all hover:bg-gray-200">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="..."/>
+  </svg>
+</button>
+```
+
+### Perplexity Design Patterns
+- **Minimalistisch**: Clean, geen onnodige decoraties
+- **Hover Interactions**: Subtiele hover states (opacity, background changes)
+- **Smooth Animations**: Framer Motion voor complexe animaties (spring: damping 25, stiffness 200)
+- **Extending Sidebars**: Pages tab extends FROM left sidebar (left-16), not floating overlay
+- **Fixed Navigation**: Sidebar uses `fixed` positioning, never scrolls
+- **Spacing**: Generous whitespace, niet overcrowded
+- **Focus States**: Altijd duidelijke focus indicators
+
+### Sidebar Architecture (Perplexity-style)
+**Left Sidebar (Main):**
+- Width: `w-16` (64px)
+- Position: `fixed left-0 top-0 bottom-0`
+- Z-index: `z-30`
+- Never scrolls with content
+
+**Secondary Tabs (Pages & Library):**
+- Width: `w-48` (192px - 25% smaller than before)
+- Position: `fixed left-16 top-0 bottom-0` (extends from main sidebar)
+- Z-index: `z-40`
+- Background: `var(--perplexity-bg)` (SAME as main content, not gray-50)
+- Border: Right border with `var(--perplexity-gray-200)`
+- **Pages Tab**: Triggers on Home icon hover OR left edge hover (w-2 zone)
+- **Library Tab**: Triggers on Sources icon hover
+- **Hover Delay**: 300ms delay before closing (setTimeout)
+- No animation: Instant show/hide
+
+**Tab Design Pattern (Perplexity-inspired):**
+- Header: uppercase, tracking-wide, xs font, tertiary color
+- Items: Icon (20x20) + Title (2 lines max) + Meta (message count, date)
+- Active state: `var(--perplexity-gray-200)` background
+- Hover: subtle opacity change
+- Delete button: opacity-0, appears on hover
+
+**Main Content:**
+- Margin: `ml-16` (space for fixed sidebar)
+- Layout: `flex flex-col h-screen` (voor fixed input bottom)
+- Scroll area: Only content scrolls, input stays fixed
+- Fixed Input Bottom: Perplexity-style textarea met Focus/Attach/Submit buttons
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- Next.js 15.1, React 19, TypeScript (strict mode)
+- Tailwind CSS (geen CSS modules)
+- Framer Motion (animaties)
+- shadcn/ui components
+- React Markdown (met syntax highlighting)
+
+### Backend
+- Vercel AI SDK 4.3
+- OpenAI GPT-4o
+- text-embedding-3-small (embeddings)
+
+### Database
+- PostgreSQL 16 met pgvector
+- DrizzleORM
+- Vector embeddings voor RAG
+
+### State Management
+- React hooks (useState, useEffect)
+- localStorage voor chat persistence (geen Redux/Zustand)
+
+---
+
+## 📁 Project Structure
+
+```
+app/
+├── page.tsx              # Main chat interface (homepage)
+├── api/
+│   ├── chat/route.ts    # Streaming chat API
+│   └── ingest/route.ts  # Document upload
+└── globals.css          # Design system (CSS variables)
+
+lib/
+├── ai/
+│   └── embedding.ts     # Text embeddings
+├── chat/
+│   └── storage.ts       # localStorage persistence (Fase 1)
+├── db/
+│   └── schema/          # Drizzle schemas
+└── actions/
+    └── resources.ts     # Document processing
+
+components/
+├── ui/                  # shadcn/ui components
+└── theme-toggle.tsx     # Dark/light mode
+```
+
+---
+
+## 🎯 Current Phase
+
+**FASE 1: IN PROGRESS** 
+- ✅ Chat geschiedenis met hover sidebar (links)
+- ✅ localStorage persistence  
+- ✅ Perplexity-stijl hover trigger (Home icon + Pages tab)
+- ✅ Auto-generated chat titles
+- ✅ Delete/nieuwe chat functionaliteit
+- ✅ Fixed sidebar (no scroll)
+- ✅ Conversation history persistence
+- ✅ Session reload from localStorage
+- ⏳ Pages tab extends from sidebar (like Perplexity)
+
+**Key Patterns:**
+- **Pages Tab**: Triggered by hovering Home icon, extends from left sidebar (not floating)
+- **Fixed Sidebar**: `fixed left-0 top-0 bottom-0` - never scrolls with content
+- **Session Management**: Auto-saves to localStorage, loads last active session on mount
+- **Message Persistence**: Full conversation history preserved across sessions
+
+**Next: FASE 2**
+- Message reload functionality (done!)
+- Search in chat history
+- Typing indicators
+- Message editing
+
+---
+
+## 📋 Code Guidelines
+
+### General
+1. **Preserve Design**: Gebruik ALTIJD de CSS variables uit `globals.css`
+2. **No Breaking Changes**: Wijzig geen bestaande styling zonder expliciete vraag
+3. **Consistent Icons**: Nieuwe icons moeten matchen met bestaande (outline style, 18px, strokeWidth 2)
+4. **TypeScript Strict**: Altijd proper types, geen `any`
+5. **Comments in Dutch**: Voor interne code (gebruikersgerichte text in Nederlands)
+
+### Styling
+- Gebruik Tailwind utility classes waar mogelijk
+- Voor custom styling: gebruik CSS variables (bijv. `style={{ color: 'var(--perplexity-text-primary)' }}`)
+- Hover states: subtiel, niet overdreven
+- Transitions: gebruik de global 150ms cubic-bezier
+- Dark mode: ALTIJD support via CSS variables
+
+### Components
+- Functional components met hooks
+- Props destructuring
+- Proper TypeScript types
+- Export type definitions samen met components
+
+### State Management
+- React hooks voor lokale state
+- **PostgreSQL Database** voor chat persistence (sessions & messages)
+- localStorage alleen voor `lastActiveSession` tracking
+- Geen global state management libraries (houd het simpel)
+- **Session Recovery**: Load last active session on mount via `lastActiveSession` key
+- **Message Loading**: Use `setMessages()` from useChat to restore conversation history
+- **Auto-save**: Save to database on every message change + store as last active session
+- **API Routes**: `/api/chat/sessions`, `/api/chat/sessions/[id]`, `/api/chat/messages`
+
+### Performance
+- Lazy loading waar mogelijk
+- Optimistische updates voor betere UX
+- Debounce voor expensive operations
+- Virtual scrolling voor lange lijsten (toekomst)
+
+---
+
+## 🔧 Development
+
+### Local
+```bash
+npm run dev              # → http://localhost:3000
+```
+
+### Docker (Production-like)
+```bash
+docker compose up -d     # → http://localhost:3005
+docker compose logs -f app
+docker compose build --no-cache  # After code changes
+```
+
+### Database
+```bash
+npm run db:migrate       # Run migrations
+npm run db:studio        # Drizzle Studio GUI
+```
+
+---
+
+## 📚 Documentation
+
+- `README.md` - Basic setup instructions
+- `masterplan.md` - Feature roadmap (6 phases) - **Master planning document**
+- `FASE1-CHAT-IMPLEMENTATIE.md` - Technical implementation details Fase 1
+- Future: `FASE2-*.md`, `FASE3-*.md`, etc.
+
+---
+
+## ✅ Implementation Checklist (voor nieuwe features)
+
+1. **Design First**: Check of het past bij Perplexity-stijl
+2. **Use CSS Variables**: Voor kleuren, nooit hardcoded values
+3. **Icon Consistency**: Match existing icon style (outline, 18px, strokeWidth 2)
+4. **Dark Mode**: Test in beide modes
+5. **TypeScript**: Proper types, geen `any`
+6. **Mobile**: Responsive design (toekomst)
+7. **Documentation**: Update FASE docs en masterplan checkboxes
+8. **Docker Test**: `docker compose build --no-cache` en test
+
+---
+
+## 🚫 Don'ts
+
+- ❌ Geen hardcoded colors (gebruik CSS variables)
+- ❌ Geen filled icons (alleen outline/stroke style)
+- ❌ Geen CSS modules (gebruik Tailwind + inline styles met variables)
+- ❌ Geen breaking changes aan bestaande design zonder vraag
+- ❌ Geen global state libraries (houd het simpel)
+- ❌ Geen onnodige dependencies
+- ❌ Geen skip van dark mode support
+- ❌ Geen floating overlays voor sidebars (extend from main sidebar instead)
+- ❌ Geen scrollable navigation (use fixed positioning)
+- ❌ Geen message clearing on session switch (load previous messages)
+
+---
+
+## 💡 When in Doubt
+
+1. Check `app/globals.css` voor design system
+2. Check `app/page.tsx` voor icon/component patterns
+3. Check `masterplan.md` voor feature roadmap
+4. Match Perplexity.ai design patterns (minimalistisch, clean, subtle)
+

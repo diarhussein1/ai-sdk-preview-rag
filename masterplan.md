@@ -15,6 +15,40 @@ IntraBot RAG Chatbot - Een geavanceerde AI-powered document processing en chat s
 - **Theming**: Dark/Light mode support with CSS variables
 - **State Management**: React Context for theme and chat state
 
+## Project Structuur
+
+```
+ai-sdk-preview-rag/
+├── app/
+│   ├── page.tsx              # Homepage met chat + hover sidebar
+│   ├── api/
+│   │   ├── chat/route.ts    # Chat API (streaming)
+│   │   └── ingest/route.ts  # Document upload
+│   └── globals.css          # Perplexity-stijl CSS
+├── lib/
+│   ├── ai/
+│   │   ├── embedding.ts     # Text embeddings
+│   │   └── index.ts         # AI utilities
+│   ├── chat/
+│   │   └── storage.ts       # localStorage chat persistence (Fase 1)
+│   ├── db/
+│   │   ├── index.ts         # Database client
+│   │   ├── migrate.ts       # Migration runner
+│   │   └── schema/          # Drizzle schemas
+│   └── actions/
+│       └── resources.ts     # Document processing
+├── components/
+│   ├── ui/                  # shadcn/ui components
+│   └── theme-toggle.tsx     # Dark mode toggle
+├── public/                  # Static assets
+├── Dockerfile              # App container
+├── compose.yaml            # Docker Compose config
+├── drizzle.config.ts       # Drizzle ORM config
+├── README.md               # Project overview
+├── masterplan.md           # Dit document (feature roadmap)
+└── FASE1-CHAT-IMPLEMENTATIE.md  # Technische docs per fase
+```
+
 ***
 
 ## FASE 1: CORE CHAT FUNCTIONALITY
